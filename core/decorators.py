@@ -7,7 +7,7 @@ logger = logging.getLogger("DuplicateFinder")
 
 
 def measure_time(func: Callable) -> Callable:
-    """Dekorator funkcji mierzący i logujący czas wykonania."""
+    """Dekorator funkcji mierzący i logujący czas wykonania"""
     @functools.wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
 
@@ -18,4 +18,21 @@ def measure_time(func: Callable) -> Callable:
         return result
     return wrapper
 
+
+def retry(attempts: int = 3, delay: float = 0.1, exceptions: Tuple[Type[Exception], ...] = (OSError,)) -> Callable:
+    """Fabryka dekoratorów: ponawia wykonanie funkcji w razie wystąpienia określonych wyjątków"""
+    def decorator(func: Callable) -> Callable: # Pierwsza warstwa -> liczba prób, opóźnienie, typy błędów
+        @functools.wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any: # Druga warswta -> dekorowana funkcja
+            for attempt in range(1, attempts + 1):
+                try:
+                    return func(*args, **kwargs) # Próba wykonania oryginalnej funkcji
+                except exceptions as e:
+                    logger.warning(f"RETRY: {func.__name__} próba {attempt}/{attempts} nieudana: {e}") # Zapis do logów -> Spodziewany błąd
+                    if attempt == attempts:
+                        logger.error(f"RETRY: Wyczerpano limit prób dla {func.__name__}") # Zapis do logów -> Błąd krytyczny (ostatnia próba w pętli)
+                        raise
+                    time.sleep(delay) 
+        return wrapper
+    return decorator
 
