@@ -26,3 +26,10 @@ def filter_by_regex(paths: Iterable[Path], pattern: str) -> Iterator[Path]:
 def filter_by_min_size(paths: Iterable[Path], min_bytes: int = 1) -> Iterator[Path]:
     """Generator odrzucający pliki mniejsze niż min_bytes (wyrażenie generujące)."""
     return (p for p in paths if p.stat().st_size >= min_bytes)
+
+def build_file_pipeline(root: Path, regex_pattern: str = r".*", min_bytes: int = 1) -> Iterator[Path]:
+    """Pipeline generatorów łączący skanowanie i dwuetapowe filtrowanie."""
+    raw_files = scan_directory_recursive(root)
+    regex_filtered = filter_by_regex(raw_files, regex_pattern)
+    size_filtered = filter_by_min_size(regex_filtered, min_bytes)
+    yield from size_filtered
