@@ -18,3 +18,10 @@ def is_valid_extension(ext: str) -> bool:
     """Waliduje format rozszerzenia pliku (np. '.txt', '.log')."""
     return VALID_EXTENSION_RE.fullmatch(ext) is not None
 
+
+def extract_file_metadata(filename: str) -> Optional[Dict[str, Optional[str]]]:
+    """Wyciąga ustrukturyzowane metadane z nazwy pliku przy użyciu grup nazwanych."""
+    match = FILENAME_META_RE.search(filename)
+    if match:
+        return match.groupdict()
+    return None
