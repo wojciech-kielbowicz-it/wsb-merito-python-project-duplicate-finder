@@ -14,3 +14,7 @@ FILENAME_META_RE = re.compile(r"""     # Ekstrakcja danych z pliku + verbose - l
 """, re.VERBOSE)
 
 
+def is_valid_extension(ext: str) -> bool:
+    """Waliduje format rozszerzenia pliku (np. '.txt', '.log')."""
+    return VALID_EXTENSION_RE.fullmatch(ext) is not None
+
