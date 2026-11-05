@@ -16,3 +16,13 @@ def scan_directory_recursive(root: Path) -> Iterator[Path]:
                     yield from scan_directory_recursive(Path(entry.path))
     except PermissionError: # wyjątek - brak dostępu
         pass
+
+def filter_by_regex(paths: Iterable[Path], pattern: str) -> Iterator[Path]:
+    """Generator filtrujący ścieżki na podstawie wyrażenia regularnego (wyrażenie generujące)."""
+    compiled_re = re.compile(pattern)
+    return (p for p in paths if compiled_re.search(p.name))
+
+
+def filter_by_min_size(paths: Iterable[Path], min_bytes: int = 1) -> Iterator[Path]:
+    """Generator odrzucający pliki mniejsze niż min_bytes (wyrażenie generujące)."""
+    return (p for p in paths if p.stat().st_size >= min_bytes)
