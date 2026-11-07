@@ -36,3 +36,14 @@ def retry(attempts: int = 3, delay: float = 0.1, exceptions: Tuple[Type[Exceptio
         return wrapper
     return decorator
 
+def requires_valid_root(method: Callable) -> Callable:
+    """Dekorator metody sprawdzający stan obiektu (self) przed wykonaniem operacji."""
+    @functools.wraps(method)
+    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
+        if not getattr(self, "_is_configured", False) or not self.root_path.exists():
+            raise RuntimeError(
+                f"Nie można wywołać '{method.__name__}': ścieżka bazowa '{self.root_path}' "
+                f"nie istnieje lub skaner nie został poprawnie skonfigurowany."
+            )
+        return method(self, *args, **kwargs)
+    return wrapper
