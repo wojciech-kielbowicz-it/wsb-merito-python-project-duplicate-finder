@@ -34,7 +34,7 @@ class TestDuplicateFinderProject(unittest.TestCase):
     def test_duplicate_scanner_threads_and_processes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            (root / "a.bin").write_bytes(b"same_2345")
+            (root / "a.bin").write_bytes(b"same_12345")
             (root / "b.bin").write_bytes(b"same_12345")
             (root / "c.bin").write_bytes(b"uniq_99999")
 
